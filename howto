@@ -1,0 +1,34 @@
+1. install mongo
+2. mkdir /data/db (with write permissions)
+3. run mongod (server)
+4. run mongo (client)
+
+### importing json file into a collection
+$ wget https://github.com/qmmr/mongodb/raw/master/zips.json
+$ mongoimport --db mydb --collection zips --file ~/zips.json
+
+### mongo shell example:
+show dbs
+use mydb
+db.getCollectionNames();
+db.zips.findOne();
+db.dropDatabase()
+
+
+### mongo-ruby driver for irb (ruby shell)
+gem update --system
+gem install mongo
+get install bson_ext
+
+### irb
+irb(main):002:0> require 'mongo'
+irb(main):008:0> Mongo::Logger.logger.level = ::Logger::INFO
+irb(main):009:0> client = Mongo::Client.new('mongodb://localhost:27017')
+irb(main):010:0> db = client.use('mydb')
+irb(main):013:0> db.database.name        # 'mydb'
+irb(main):014:0> db.database.collection_names
+irb(main):015:0> db[:zips].find.first
+
+
+
+
