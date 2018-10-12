@@ -1,8 +1,8 @@
 require 'pp'
+require 'mongo'
 
 class Solution
 
-  require 'mongo'
   Mongo::Logger.logger.level = ::Logger::INFO
   
   @@db = nil
@@ -12,19 +12,27 @@ class Solution
     #create a `Mongo::Client` connection to the server using a URL (.e.g., 'mongodb://localhost:27017')
     #configure the client to use the `test` database
     #assign the client to @@db class variable and return that client
-    
+    client = Mongo::Client.new('mongodb://localhost:27017')
+    client = client.use('test')
+    @@db = client.database
+    client
   end
 
   #Implement a class method in the `Solution` class called `collection` that will
   def self.collection
     #return the `zips` collection
-    
+    self.mongo_client if not @@db
+    @@db[:zips]
+
   end
 
   #Implement an instance method in the `Solution` class called `sample` that will
   def sample
     #return a single document from the `zips` collection from the database. 
     #This does not have to be random. It can be first, last, or any other document in the collection.
+#    @@db[:zips].find.first
+    self.class.collection.find.first
+
 
   end
 end
