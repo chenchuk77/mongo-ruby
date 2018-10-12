@@ -1,6 +1,10 @@
 require 'pp'
 
 class Solution
+
+  require 'mongo'
+  Mongo::Logger.logger.level = ::Logger::INFO
+  
   @@db = nil
   
   #Implement a class method in the `Solution` class called `mongo_client` that will 
