@@ -6,7 +6,6 @@
 ### importing json file into a collection
 $ wget https://github.com/qmmr/mongodb/raw/master/zips.json
 $ mongoimport --db mydb --collection zips --file ~/zips.json
-$ mongoimport --drop --db test --collection zips ./zips.json
 
 ### mongo shell example:
 show dbs
@@ -30,9 +29,16 @@ irb(main):013:0> db.database.name        # 'mydb'
 irb(main):014:0> db.database.collection_names
 irb(main):015:0> db[:zips].find.first
 
-### load file into irb shell
-chenchuk ~/mongo/ irb
-irb(main):001:0> source('./start.rb')
 
+### example loading file into irb
+$ irb
+> require './assignment.rb'
+> db=Solution.mongo_client
+> pp db[:zips].find.first
+{"_id"=>"01001",
+ "city"=>"AGAWAM",
+ "loc"=>[-72.622739, 42.070206],
+ "pop"=>15338,
+ "state"=>"MA"}
 
 
