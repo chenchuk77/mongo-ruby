@@ -20,14 +20,71 @@ gem update --system
 gem install mongo
 get install bson_ext
 
-### irb
+### irb ( disable trainling by adding ;nil )
 irb(main):002:0> require 'mongo'
 irb(main):008:0> Mongo::Logger.logger.level = ::Logger::INFO
 irb(main):009:0> client = Mongo::Client.new('mongodb://localhost:27017')
-irb(main):010:0> db = client.use('mydb')
-irb(main):013:0> db.database.name        # 'mydb'
+irb(main):010:0> client = client.use('test')
+irb(main):011:0> db = client.database
+irb(main):013:0> db.name        # 'test'
 irb(main):014:0> db.database.collection_names
+
+
+--- querying db from ruby shell
+irb(main):090:0> db[:zips].find.count
 irb(main):015:0> db[:zips].find.first
+irb(main):068:0> db[:zips].find.map { |x| p x }
+irb(main):064:0> db[:zips].find.to_a.map { |doc| p doc }
+irb(main):087:0> db[:zips].find(:city => 'HAINES').map {|r| }p r
+irb(main):089:0> db[:zips].find(:city => 'HAINES').count
+irb(main):167:0> db[:zips].find.distinct(:state)
+irb(main):170:0> db[:zips].find(:city => 'GERMANTOWN').count     # 8
+irb(main):184:0> pp db[:zips].find(:city => 'GERMANTOWN', :state => 'NY').first
+irb(main):201:0> db[:users].find().each { |r| pp r}
+
+
+--- CRUD
+irb(main):107:0> db[:zips].insert_one(:city => 'RISHON',:loc => [-10,-20])
+irb(main):117:0> tlv = {:name => 'TLV', :loc => [30, 40]}
+
+irb(main):140:0> john = {:name => 'john', :age => 19}
+irb(main):141:0> jack = {:name => 'jack', :age => 34}
+irb(main):142:0> jane = {:name => 'jane', :age => 34}
+irb(main):144:0> db[:users].insert_one(john)
+irb(main):148:0> db[:users].insert_many([jack, jane])
+irb(main):158:0> db[:users].find.map {|x| p x}
+
+-- filtering / paging /projection / sort (asc=1, desc=-1)
+irb(main):230:0> db[:zips].find.limit(3).each {|x| puts x}
+irb(main):235:0> db[:zips].find.limit(3).skip(3).each {|x| puts x}
+irb(main):240:0> db[:zips].find.limit(10).sort(:city => 1).each {|x| puts x}
+irb(main):243:0> db[:zips].find.limit(10).sort(:city => -1).each {|x| puts x}
+irb(main):257:0> db[:zips].find.limit(10).projection({:city => true, :_id => false}).each {|x| puts x}
+irb(main):261:0> db[:zips].find.limit(3).projection({:city => true, :_id => false}).each {|x| pp x}
+
+
+-- advanced querying
+
+irb(main):304:0> db[:zips].find(:city => {:$gt => 'DA', :$lt => 'DB'}).limit(5).each {|r| puts r}
+irb(main):315:0> db[:zips].find(:city => {:$regex => 'T$'}).limit(5).each {|r| puts r}; nil
+# all records that doesnt have :city field (nosql)
+irb(main):351:0> db[:zips].find(:city => {:$exists => false}).each {|r| pp r}
+irb(main):367:0> db[:zips].find(:city => {:$exists => true}).projection({:_id => false}).limit(3).to_a.each {|r| pp r}; nil
+irb(main):390:0> db[:zips].find(:pop => { '$not' => { '$gt' => 9500 }}).projection({_id:false}).limit(20).to_a.each {|r| pp r};nil
+
+
+# check if its a String (BSON type)
+irb(main):410:0> db[:zips].find({:state=>{'$type'=>2}}).first
+
+
+
+
+
+
+
+
+
+
 
 
 ### example loading file into irb
@@ -40,5 +97,7 @@ $ irb
  "loc"=>[-72.622739, 42.070206],
  "pop"=>15338,
  "state"=>"MA"}
+
+----- mongo CRUD
 
 
